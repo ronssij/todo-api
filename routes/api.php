@@ -25,9 +25,19 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::group(['middleware' => 'auth:api'], function ($router) {
         Route::group(['prefix' => 'user'], function () {
             Route::get('/', [\App\Http\Controllers\UserProfileController::class, 'index'])
-                ->name('auth.user.profile');
+                ->name('user.profile');
 
-            Route::get('/todo-list', [\App\Http\Controllers\UserListController::class, 'index']);
+            Route::get('/todo-list', [\App\Http\Controllers\UserListController::class, 'index'])
+                ->name('user.todo-list');
+
+            Route::post('/todo-list', [\App\Http\Controllers\UserListController::class, 'store'])
+                ->name('user.todo-list.store');
+
+            Route::put('/todo-list/{userList}', [\App\Http\Controllers\UserListController::class, 'update'])
+                ->name('user.todo-list.update');
+
+            Route::delete('/todo-list/{userList}', [\App\Http\Controllers\UserListController::class, 'destroy'])
+                ->name('user.todo-list.destroy');
         });
     });
 });

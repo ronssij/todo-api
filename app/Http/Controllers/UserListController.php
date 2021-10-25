@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ListResource;
+use App\Models\UserList;
 use Illuminate\Http\Request;
 
 class UserListController extends Controller
@@ -13,17 +15,9 @@ class UserListController extends Controller
      */
     public function index()
     {
+        $lists = user()->lists()->get();
 
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return ListResource::collection($lists);
     }
 
     /**
@@ -34,19 +28,15 @@ class UserListController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'title' => ['required']
+        ]);
+
+        $list = user()->lists()->create($request->all());
+
+        return ListResource::make($list);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -55,9 +45,18 @@ class UserListController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, UserList $userList)
     {
-        //
+        $valdidated = $request->validate([
+            'title'    => ['required'],
+            'complete' => ['required', 'sometimes']
+        ]);
+
+        $userList->title        = $valdidated['title'];
+        $userList->completed_at = $valdidated['complete'] ? now() : null;
+        $userList->save();
+
+        return ListResource::make($userList);
     }
 
     /**
@@ -66,8 +65,12 @@ class UserListController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(UserList $userList)
     {
-        //
+        $userList->delete();
+
+        return response()->json([
+            'data' => 'Item deleted'
+        ], 200);
     }
 }

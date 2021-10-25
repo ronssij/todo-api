@@ -17,7 +17,12 @@ class UserResource extends JsonResource
         return [
             'id'    => $this->id,
             'name'  => $this->name,
-            'email' => $this->email
+            'email' => $this->email,
+
+            /**
+             * Relationships
+             */
+            'lists' => ListResource::collection($this->whenLoaded('lists'))
         ];
     }
 }
